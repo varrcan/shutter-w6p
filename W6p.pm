@@ -77,10 +77,10 @@ sub init {
     use Path::Class;
 
     $self->{_config} = {};
-    $self->{_config_file} = file($ENV{'HOME'}, '.w6p-token');
+    $self->{_config_file} = file($ENV{'HOME'}, '/.shutter/shutter-config');
 
     $self->load_config;
-    if (!$self->{_config}->{access_token}) {
+    if (!$self->{_config}->{w6p_token}) {
         return $self->connect;
     }
 
@@ -127,7 +127,7 @@ sub setup {
     );
 
     if ($button == 20) {
-        $self->{_config}->{access_token} = $pin;
+        $self->{_config}->{w6p_token} = $pin;
         $self->{_config_file}->openw->print(encode_json($self->{_config}));
         chmod 0600, $self->{_config_file};
 
@@ -162,7 +162,7 @@ sub upload {
         my $response = $client->request(POST 'https://w6p.ru/site/upload',
             Content_Type => 'form-data',
             Content      => [
-                'token'                 => $self->{_config}->{access_token},
+                'token'                 => $self->{_config}->{w6p_token},
                 'UploadForm[imageFile]' => [ $upload_filename ],
             ]
         );
