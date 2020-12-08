@@ -116,11 +116,14 @@ sub setup {
     });
 
     my $button = $sd->dlg_info_message(
-        "Пожалуйста, введите токен из приложения WEBKPI",
-        $d->get("Авторизация"),
-        'gtk-cancel', 'gtk-apply', undef,
-        undef, undef, undef, undef, undef,
-        $pin_entry,
+        "Пожалуйста, введите токен из приложения WEBKPI", # message
+        "Авторизация", # header
+        'gtk-cancel', 'gtk-apply', undef, # button text
+        undef, undef, undef, # button widget
+        undef, # detail message
+        undef, # detail checkbox
+        $pin_entry, # content widget
+        Gtk2::LinkButton->new ("https://cp.webpractik.ru/marketplace/app/8/", $d->get("WEBKPI")), # content widget2
     );
 
     if ($button == 20) {
