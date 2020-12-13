@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"os/user"
 	"path"
 	"path/filepath"
 	"strings"
@@ -52,6 +53,9 @@ func main() {
 
 	// Обновление бинарника
 	fixShutter()
+
+	// Стандартные настройки
+	baseSettings()
 
 	pterm.DefaultSection.WithLevel(2).Println("Все готово! \n   Для удобства использования, вы можете установить в настройках системы действие на сочетание Ctrl+PrtSc, \n   указав в качестве команды: shutter -s")
 }
@@ -167,10 +171,10 @@ func baseSettings() {
 	load := download("https://raw.githubusercontent.com/varrcan/shutter-w6p/master/.shutter.zip")
 	handleError(load)
 
-	_, err := Unzip(".shutter.zip", "")
-	if err != nil {
-		log.Fatal(err)
-	}
+	usr, err := user.Current()
+
+	_, err = Unzip(".shutter.zip", usr.HomeDir)
+	handleError(err)
 
 	time.Sleep(time.Second * 1)
 	settings.Success()
