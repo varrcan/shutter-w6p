@@ -157,7 +157,7 @@ func fixShutter() {
 	load := download("https://raw.githubusercontent.com/varrcan/shutter-w6p/master/shutter")
 	handleError(load)
 
-	mv := exec.Command("/bin/bash", "-c", "sudo mv -f shutter /usr/bin")
+	mv := exec.Command("/bin/bash", "-c", "sudo mv -f shutter /usr/bin && sudo chmod +x /usr/bin/shutter")
 
 	_, err := mv.CombinedOutput()
 	handleError(err)
