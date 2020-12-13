@@ -143,7 +143,7 @@ func installModules() {
 	load := download("https://raw.githubusercontent.com/varrcan/shutter-w6p/master/W6p.pm")
 	handleError(load)
 
-	mv := exec.Command("/bin/bash", "-c", "sudo mv W6p.pm "+moduleDir)
+	mv := exec.Command("/bin/bash", "-c", "sudo mv -f W6p.pm "+moduleDir)
 
 	_, err := mv.CombinedOutput()
 	handleError(err)
@@ -157,7 +157,7 @@ func fixShutter() {
 	load := download("https://raw.githubusercontent.com/varrcan/shutter-w6p/master/shutter")
 	handleError(load)
 
-	mv := exec.Command("/bin/bash", "-c", "sudo mv shutter /usr/bin")
+	mv := exec.Command("/bin/bash", "-c", "sudo mv -f shutter /usr/bin")
 
 	_, err := mv.CombinedOutput()
 	handleError(err)
@@ -172,9 +172,13 @@ func baseSettings() {
 	handleError(load)
 
 	usr, err := user.Current()
-
-	_, err = Unzip(".shutter.zip", usr.HomeDir)
 	handleError(err)
+
+	_, unzip := Unzip(".shutter.zip", usr.HomeDir)
+	handleError(unzip)
+
+	del := os.Remove(".shutter.zip")
+	handleError(del)
 
 	time.Sleep(time.Second * 1)
 	settings.Success()
