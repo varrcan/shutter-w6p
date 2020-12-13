@@ -177,7 +177,7 @@ func baseSettings() {
 	_, unzip := Unzip(".shutter.zip", usr.HomeDir)
 	handleError(unzip)
 
-	del := os.Remove(".shutter.zip")
+	del := os.Remove(usr.HomeDir + "/.shutter.zip")
 	handleError(del)
 
 	time.Sleep(time.Second * 1)
