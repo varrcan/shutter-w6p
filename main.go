@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"os/user"
 	"path"
 	"path/filepath"
 	"strings"
@@ -48,8 +47,14 @@ func main() {
 	// Установка shutter
 	shutterInstall()
 
+	// Удаление стандартных модулей
+	deleteOldModules()
+
 	// установка модуля w6p
 	installModules()
+
+	// установка модуля YaCloud
+	installYaCloud()
 
 	// Обновление бинарника
 	fixShutter()
@@ -74,7 +79,7 @@ func repoAdd() {
 }
 
 func depsInstall() {
-	pterm.Info.Println("Установка зависимостей")
+	pterm.Success.Println("Установка зависимостей")
 	spinnerDep, _ := pterm.DefaultSpinner.Start()
 
 	spinnerDep.UpdateText("Обновление кеша")
@@ -137,13 +142,27 @@ func countDeps() []string {
 func installModules() {
 	moduleDir := "/usr/share/shutter/resources/system/upload_plugins/upload"
 
-	deleteOldModules(moduleDir)
-
 	w6pAdd, _ := pterm.DefaultSpinner.Start("Установка модуля w6p")
 	load := download("https://raw.githubusercontent.com/varrcan/shutter-w6p/master/W6p.pm")
 	handleError(load)
 
 	mv := exec.Command("/bin/bash", "-c", "sudo mv -f W6p.pm "+moduleDir)
+
+	_, err := mv.CombinedOutput()
+	handleError(err)
+
+	time.Sleep(time.Second * 1)
+	w6pAdd.Success()
+}
+
+func installYaCloud() {
+	moduleDir := "/usr/share/shutter/resources/system/upload_plugins/upload"
+
+	w6pAdd, _ := pterm.DefaultSpinner.Start("Установка модуля YandexCloud")
+	load := download("https://raw.githubusercontent.com/varrcan/shutter-s3/master/YandexCloud.pm")
+	handleError(load)
+
+	mv := exec.Command("/bin/bash", "-c", "sudo mv -f YandexCloud.pm "+moduleDir)
 
 	_, err := mv.CombinedOutput()
 	handleError(err)
@@ -171,20 +190,22 @@ func baseSettings() {
 	load := download("https://raw.githubusercontent.com/varrcan/shutter-w6p/master/.shutter.zip")
 	handleError(load)
 
-	usr, err := user.Current()
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	handleError(err)
 
-	_, unzip := Unzip(".shutter.zip", usr.HomeDir)
+	_, unzip := Unzip(".shutter.zip", dir)
 	handleError(unzip)
 
-	del := os.Remove(usr.HomeDir + "/.shutter.zip")
+	del := os.Remove(dir + "/.shutter.zip")
 	handleError(del)
 
 	time.Sleep(time.Second * 1)
 	settings.Success()
 }
 
-func deleteOldModules(directory string) {
+func deleteOldModules() {
+	directory := "/usr/share/shutter/resources/system/upload_plugins/upload"
+
 	deleteModules, _ := pterm.DefaultSpinner.Start("Удаление стандартных модулей")
 	if _, err := os.Stat(directory); err != nil {
 		if os.IsNotExist(err) {
