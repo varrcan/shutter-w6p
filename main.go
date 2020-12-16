@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"os/user"
 	"path"
 	"path/filepath"
 	"strings"
@@ -190,10 +191,11 @@ func baseSettings() {
 	load := download("https://raw.githubusercontent.com/varrcan/shutter-w6p/master/.shutter.zip")
 	handleError(load)
 
+	usr, _ := user.Current()
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	handleError(err)
 
-	_, unzip := Unzip(".shutter.zip", dir)
+	_, unzip := Unzip(".shutter.zip", usr.HomeDir)
 	handleError(unzip)
 
 	del := os.Remove(dir + "/.shutter.zip")
